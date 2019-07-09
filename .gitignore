@@ -23,6 +23,11 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+
+config.py
+__pycache__
+.ipynb_checkpoints
+
 MANIFEST
 
 # PyInstaller

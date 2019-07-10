@@ -1,9 +1,10 @@
 # Work with Python 3.6
 import discord
 import random
-import tokenize
 import mysql.connector
 import config
+#chat hooks
+import silly
 
 
 TOKEN = config.TOKEN
@@ -26,9 +27,10 @@ async def on_message(message):
     if message.author == client.user:
         return
 
+    msg = silly.chat_hooks(message.content)
+
     if message.content.startswith('!hello'):
         msg = 'Hello {0.author.mention}'.format(message)
-        await client.send_message(message.channel, msg)
 
     if message.content.startswith('!20'):
         roll = random.randint(1,20)
@@ -138,11 +140,14 @@ async def on_message(message):
 
         await client.send_message(message.channel, msg)
 
-    if 'http://getcomfy.in/l_egu' in message.content:
-        tempMsgChan = message.channel
-        await client.delete_message(message)
-        out_msg = "No one wants to buy your underwear Love"
-        await client.send_message(tempMsgChan, out_msg)
+    #if 'http://getcomfy.in/l_egu' in message.content:
+     #   tempMsgChan = message.channel
+     #   await client.delete_message(message)
+    #    out_msg = "No one wants to buy your underwear Love"
+    #    await client.send_message(tempMsgChan, out_msg)
+
+    if msg is not "":
+        await message.channel.send(msg)
 
 
 

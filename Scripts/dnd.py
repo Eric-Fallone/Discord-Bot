@@ -3,52 +3,45 @@ import random
 # DND and dice roll commands
 
 
-cursor = ""
+async def chat_hooks(bot_commands, cursor, root, inputs):
 
+    if root == '!20':
+        await roll20(bot_commands)
 
-def chat_hooks(message, cursor_in):
-    global cursor
-    cursor = cursor_in
-    if message.startswith('!20'):
-        return roll20()
+    if root == '!getStat':
+        await get_ststs(bot_commands, cursor, inputs)
 
-    if message.startswith('!getStat'):
-        return get_ststs(message)
+    if root == '!rollStats':
+        await roll_stats(bot_commands, inputs)
 
-    if message.startswith('!rollStats'):
-        return roll_stats()
+    if root == '!roll':
+        await roll(bot_commands, inputs)
 
-    if message.startswith('!roll'):
-        return roll(message)
+    if root == '!ini':
+        await initiative(bot_commands, cursor)
 
-    if message.startswith('!ini'):
-        return initiative()
-
-    return ""
+    return
 
 # rolls a d20 short hand for most used die
 # INPUTS: NONE
 # OUTPUTS: Random number between 1 and 20
 
 
-def roll20():
+async def roll20(bot_commands):
     dice = random.randint(1, 20)
-    msg = ('You rolled a: ' + str(dice))
-    return msg
+    out_msg = ('You rolled a: ' + str(dice))
+    await bot_commands.send_message(out_msg)
 
 
-# Get Charater Stats
+# Get Character Stats
 # INPUT: character name, stat to get
 # OUTPUT: character stats from database
 
 
-def get_ststs(message):
-    tokens = message.split(' ')
-    print(tokens)
-    del tokens[0]
-    char_name = str(tokens[0])
+async def get_ststs(bot_commands, cursor, inputs):
+    char_name = str(inputs[0])
 
-    getStat = tokens[1]
+    getStat = inputs[1]
 
     msg = 'Getting ' + getStat + " for " + char_name + "\n"
 
@@ -56,7 +49,7 @@ def get_ststs(message):
     for row in cursor.fetchall():
         msg += str(row[0]) + "\n"
 
-    return msg
+        await bot_commands.send_message(msg)
 
 
 # generates a stat block that rolls 4d6 and removes the lowest number
@@ -64,7 +57,7 @@ def get_ststs(message):
 # OUTPUT: returns stat block and a history showing rolls
 
 
-def roll_stats():
+async def roll_stats(bot_commands):
     roll1 = [random.randint(1, 6), random.randint(1, 6), random.randint(1, 6), random.randint(1, 6)]
     roll2 = [random.randint(1, 6), random.randint(1, 6), random.randint(1, 6), random.randint(1, 6)]
     roll3 = [random.randint(1, 6), random.randint(1, 6), random.randint(1, 6), random.randint(1, 6)]
@@ -91,7 +84,7 @@ def roll_stats():
     msg += "Sixth Stat: " + str(sum(roll6)) + " Rolls: " + str(roll6) + " Lowest: " + str(removed_rolls[5]) + "\n\n"
     msg += "Final Stats are:" + str([sum(roll1), sum(roll2), sum(roll3), sum(roll4), sum(roll5), sum(roll6)])
 
-    return msg
+    await bot_commands.send_message(msg)
 
 
 # A dice roll funtion that rolls
@@ -99,13 +92,10 @@ def roll_stats():
 # OUTPUT: Dice rolled or error message with wrong format
 
 
-def roll(message):
-    tokens = message.split(' ')
-    del tokens[0]
-    print(tokens)
+async def roll(bot_commands, inputs):
     msg = ""
     total = 0
-    for token in tokens:
+    for token in inputs:
         helper = token.split('d')
         print(helper)
         num_of_rolls = int(helper[0])
@@ -124,9 +114,9 @@ def roll(message):
         total += sum(token_rolls)
         msg = msg + ")"
 
-    out_msg = "Total: "+str(total)+"\nRolls: "+msg
+    msg = "Total: "+str(total)+"\nRolls: "+msg
 
-    return out_msg;
+    await bot_commands.send_message(msg)
 
 
 # Rolls intiative based on the active members in session
@@ -134,7 +124,7 @@ def roll(message):
 # OUTPUT: Initive list in order of highest to lowest
 
 
-def initiative():
+async def initiative(bot_commands, cursor):
     msg = 'Initiative' + "\n"
     # name ,
     data = []
@@ -153,5 +143,5 @@ def initiative():
     for row in data:
         msg += str(row[0]) + ": " + str(row[1]) + "\n"
 
-    return msg
+    await bot_commands.send_message(msg)
 

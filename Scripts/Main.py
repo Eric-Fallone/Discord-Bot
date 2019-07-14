@@ -5,19 +5,21 @@ import config
 #chat hooks
 import silly
 import dnd
+from Bot_Commands import BotCommands
 
 TOKEN = config.TOKEN
 
 client = discord.Client()
 
-serv = mysql.connector.connect(
+server = mysql.connector.connect(
     host=config.host,
     user=config.user,
     password=config.password,
     database=config.database,
 )
 
-cursor = serv.cursor()
+cursor = server.cursor()
+
 
 @client.event
 async def on_message(message):
@@ -25,11 +27,15 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    msg = silly.chat_hooks(message.content)
-    msg = dnd.chat_hooks(message.content, cursor)
-    if msg is not "":
-        await message.channel.send(msg)
+    bot_commands = BotCommands(message)
+    #await bot_commands.send_message("test")
 
+    inputs = message.content.split(' ')
+    root = inputs[0]
+    del inputs[0]
+
+    await silly.chat_hooks(bot_commands, root, inputs)  # silly chat hooks can trigger without using a hook
+    await dnd.chat_hooks(bot_commands, cursor, root, inputs)
 
 
 @client.event
@@ -40,3 +46,4 @@ async def on_ready():
     print('------')
 
 client.run(TOKEN)
+

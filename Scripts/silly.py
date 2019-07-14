@@ -1,12 +1,23 @@
-#silly functions module
+# silly functions module
 
 
-def chat_hooks(message):
-    if 'http://getcomfy.in/l_egu' in message:
-        out_msg = "No one wants to buy your underwear Love"
-        return out_msg
+async def chat_hooks(bot_commands, root, inputs):
 
-    if message.startswith('!hello'):
-        return 'Hello {0.author.mention}'.format(message)
+    if 'http://getcomfy.in/l_egu' in inputs or root == 'http://getcomfy.in/l_egu':
+        await no_one_wants_to_buy_it_kyle(bot_commands)
 
-    return "", ""
+    if root == '!hello':
+        print(root is '!hello')
+        await bot_commands.send_message("Hello")
+
+    return
+
+
+async def no_one_wants_to_buy_it_kyle(bot_commands):
+    out_msg = "No one wants to buy your underwear Love"
+    await bot_commands.send_message(out_msg)
+
+
+async def hello(bot_commands):
+    out_msg = "Hello!"
+    await bot_commands.send_message(out_msg)
